@@ -2,7 +2,7 @@ import cv2, dlib, math
 import numpy as np
 from scipy.spatial import distance as dist
 
-from EulerAng import faceIndex, make3d, make2d, get_euler_angle
+from utils.EulerAng import faceIndex, make3d, make2d, get_euler_angle
 
 class Counter():
     def __init__(self, frames, ratio = 0.6) -> None:

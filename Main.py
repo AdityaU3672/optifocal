@@ -24,7 +24,7 @@ def gen(camera):
 
 @up.route('/video_feed')
 def video_feed():
-    camera = DE.attn_detector("resc/shape_68.dat")
+    camera = DE.attn_detector("resc/shape_68.dat", 0)
 
     
     return Response(gen(camera),

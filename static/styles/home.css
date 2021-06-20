@@ -10,13 +10,14 @@ body{
 	padding: 0px;
 	background-color: #cdf0ea;
 	padding-bottom: 4%;
+	
   }
   
   .container {
   }
   
   .header_div {
-	padding-top: 8%;
+	padding-top: 10%;
 	padding-bottom: 5%;
 	padding-left: 5%;
 	text-align: left;
@@ -26,11 +27,12 @@ body{
 	margin-bottom: 1rem;
   }
   .header_text {
-	margin-bottom: 3rem;
+	margin-bottom: 2.2rem;
+	font-size: 1.3rem;
   }
   
   .header_image_div {
-	padding-top: 6%;
+	padding-top: 4%;
 	padding-bottom: 5%;
 	padding-left: 5%;
 	text-align: center;

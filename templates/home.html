@@ -18,8 +18,8 @@
       crossorigin="anonymous"
     ></script>
 
-    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='styles/home.css') }}" /> -->
-    <link rel="stylesheet" href="../static/styles/home.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/home.css') }}" />
+    <!-- <link rel="stylesheet" href="../static/styles/home.css" /> -->
     <title>Distraction Detector</title>
   </head>
   <body>
@@ -28,7 +28,7 @@
         <div class="container-fluid">
           <div class="row">
             <div class="col-lg-6 header_div">
-              <h1 class="heading">Welcome to _________</h1>
+              <!-- <h1 class="heading">Welcome to Optifocal</h1> -->
               <p class="header_text">
                 This is some random text that is emulating the header text.This
                 is some random text that is emulating the header text.This is
@@ -38,9 +38,10 @@
                 >Click for demo</a
               >
             </div>
+            <!-- "../static/styles/logo2.png" -->
             <div class="col-lg-6 header_image_div">
               <img
-                src="https://images.unsplash.com/photo-1597404294360-feeeda04612e?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8Y2FyfGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80"
+                src="{{ url_for('static', filename='styles/logo2.png') }}" 
                 alt=""
                 class="header_image"
               />
@@ -52,7 +53,7 @@
 
     <section id="about_project">
       <div class="about_project_div">
-        <h1 class="about_project_heading">About __________</h1>
+        <h1 class="about_project_heading">About the Drive</h1>
         <img
           src="https://cdn.luxe.digital/media/2020/12/15110747/fastest-cars-world-2021-luxe-digital%402x.jpg"
           alt=""
@@ -91,12 +92,12 @@
       <div class="github_div">
         <div class="card">
           <div class="card-header">
-            <h6>Learn more about _________</h6>
+            <h6>Learn more about Optifocal</h6>
           </div>
           <div class="card-body">
             <div class="inner_card_div">
               <p>Find the GitHub Repo here:</p>
-              <a href=""><i class="fab fa-github icon"></i></a>
+              <a href="https://github.com/AdityaU3672/optifocal"><i class="fab fa-github icon"></i></a>
             </div>
           </div>
         </div>
@@ -105,7 +106,7 @@
 
     <section id="footer">
       <div class="footer_div">
-        <p>Copyright@ __________ 2021</p>
+        <p>Copyright@ Optifocal 2021</p>
       </div>
     </section>
   </body>

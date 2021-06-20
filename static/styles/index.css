@@ -6,6 +6,11 @@ body{
     text-align: center;
 }
 
+/* .face{
+    background-image: url("https://cdn.osxdaily.com/wp-content/uploads/2013/12/there-is-no-connected-camera-mac.jpg");
+    width:400px;
+} */
+
 .heading{
     color:rgb(126, 35, 35);
 }
