@@ -1,6 +1,6 @@
 import flask
 from flask import Flask, request, jsonify, render_template, Response
-import droid_eyes as DE
+import utils.droid_eyes as DE
 #from camera import Camera
 #from refactored import *
 
