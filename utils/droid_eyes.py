@@ -221,7 +221,7 @@ class attn_detector:
         ret, self.img = self.cap.read()
 
         if not ret:
-            return -3, -3, -3;
+            return -3, -3, -3
 
         gray = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
         faces = self.detector(gray) # , 1) # adding this second argument detects faces better, but is significantyl slower
@@ -311,14 +311,45 @@ class attn_detector:
 
     ## SECTION 6: INIT
 
+    def cam_release(self):
+        if self.cap:
+            self.cap.release()
 
+            self.calib_hori.reset()
+            self.calib_vert.reset()
+
+            self.consec_gaze.reset()
+            self.consec_hori.reset()
+            self.consec_vert.reset()
+
+    def cam_capture(self):
+        self.cap = cv2.VideoCapture(self.cam)
+            # assuming that the camera stays constant, we can get these values at the start
+        # if there is the possibility that the camera can change, put everythig here into the loop
+        _, self.img = self.cap.read()
+        size = self.img.shape
+        
+        self.xmin = (size[1]//10)
+        self.xmax = self.xmin * 9
+        self.ymin = (size[0]//10)
+        self.ymax = self.ymin * 9
+
+        self.focal_length = size[1]
+        self.center = (size[1]/2, size[0]/2)
+        self.camera_matrix = np.array([[self.focal_length, 0, self.center[0]],
+                                        [0, self.focal_length, self.center[1]],
+                                        [0, 0, 1]], dtype = "double"
+                                        )
+
+        #PREREQS DONE
+        self.update = self.calibrate
 
     def __init__(self, mdel = "shape_68.dat", cam = 0) -> None:
         self.detector = dlib.get_frontal_face_detector()
         self.predictor = dlib.shape_predictor(mdel)
         
-        self.cap = cv2.VideoCapture(cam)
-
+        self.cap = 0
+        self.cam = cam
         self.font = cv2.FONT_HERSHEY_SIMPLEX
 
         self.model_points = make3d()
@@ -341,22 +372,5 @@ class attn_detector:
         self.base_yaw = 0
         self.base_pitch = 0
 
-        # assuming that the camera stays constant, we can get these values at the start
-        # if there is the possibility that the camera can change, put everythig here into the loop
-        _, self.img = self.cap.read()
-        size = self.img.shape
-        
-        self.xmin = (size[1]//10)
-        self.xmax = self.xmin * 9
-        self.ymin = (size[0]//10)
-        self.ymax = self.ymin * 9
 
-        self.focal_length = size[1]
-        self.center = (size[1]/2, size[0]/2)
-        self.camera_matrix = np.array([[self.focal_length, 0, self.center[0]],
-                                        [0, self.focal_length, self.center[1]],
-                                        [0, 0, 1]], dtype = "double"
-                                        )
 
-        #PREREQS DONE
-        self.update = self.calibrate

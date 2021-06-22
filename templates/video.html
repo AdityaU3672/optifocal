@@ -11,7 +11,7 @@
       integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x"
       crossorigin="anonymous"
     />
-    <link rel="stylesheet" href="video.css" />
+    <link rel="stylesheet" href="../static/styles/video.css" />
     <title>Distraction Detector</title>
   </head>
   <body>
@@ -21,11 +21,8 @@
       </div>
 
       <div class="image_div">
-        <img
-          class="image"
-          id="bg"
-          src="https://cdn.osxdaily.com/wp-content/uploads/2013/12/there-is-no-connected-camera-mac.jpg"
-        />
+        <img class="image "id="video" src="{{ url_for('video_feed')  }}" alt="Lol turn on your camera (fr though, make sure your primary camera isn't being used by another application)" 
+        onerror="this.onerror=null;this.src='https://cdn.osxdaily.com/wp-content/uploads/2013/12/there-is-no-connected-camera-mac.jpg';">
       </div>
     </section>
 
@@ -75,10 +72,13 @@
     </section>
     <section id="footer">
       <div class="footer_div">
-        <p>Copyright@ __________ 2021</p>
+        <p>Copyright@ Optifocal 2021</p>
       </div>
     </section>
   </body>
+  <script>
+
+  </script>
   <script
     src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
     integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"

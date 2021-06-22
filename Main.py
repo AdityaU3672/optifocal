@@ -6,6 +6,8 @@ import utils.droid_eyes as DE
 
 up = Flask(__name__)
 
+global_camera = DE.attn_detector("resc/shape_68.dat", 0)
+
 @up.route('/')
 def home():
     #add render for home page
@@ -13,8 +15,14 @@ def home():
 
 @up.route('/video')
 def index():
+    global global_camera
+    global_camera.cam_release()
+    #global_camera  = DE.attn_detector("resc/shape_68.dat", 0)
+    global_camera.cam_capture()
+
     ## Place While Loops Here
-    return render_template("index.html")
+    return render_template("video.html")
+
 def gen(camera):
     while True:
         _, _, _ = camera.update()
@@ -24,10 +32,9 @@ def gen(camera):
 
 @up.route('/video_feed')
 def video_feed():
-    camera = DE.attn_detector("resc/shape_68.dat", 0)
-
+    global global_camera
     
-    return Response(gen(camera),
+    return Response(gen(global_camera),
             mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__=='__main__':
