@@ -1,27 +1,50 @@
 from flask import Flask, render_template, request, jsonify, Response
+import numpy as np
+import cv2
 from flask_socketio import SocketIO
 import droid_eyes as DE
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
+x = "inpt.jpg"
 
-
-global_camera = DE.attn_detector("resc/shape_68.dat", 0)
+global_camera = DE.attn_detector()
 
 @app.route('/')
 def home():
     return render_template("index.html")
 
-
-@socketio.on("my event")
-def handle_my_custom_event(json):
-    print('received json: ' + str(json))
+# @socketio.on('testing')
+# def lfrm(inpt):
+#     print(inpt)
 
 #Updates when there's a new frame
-@socketio.on('frame')
+@socketio.on('newframe')
 def loadframe(image):
-    global_camera.update(image)
+    print("image received")
+    #global_camera.update(image)
+    global x
+    
+    f = open(x, "wb")
+    f.write(image.encode())
+    f.close()
+
+    x = "wow.jpg"
+    # img_str = fd.read()
+    # fd.close()
+
+    # fd = open('timg.jpg', 'rb')
+    # img_str = fd.read()
+    # fd.close()
+
+    # nparr = np.frombuffer(image.decode(), np.uint8)
+    # img_np = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
+    # cv2.imshow('RGB',img_np)
+    # cv2.waitKey(0)
+
+    #print(image)
 
 #Returns the most recently processed frame
 def gen(camera):
@@ -31,14 +54,14 @@ def gen(camera):
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 
 #same as before
-@up.route('/video_feed')
+@app.route('/video_feed')
 def video_feed():
-    global global_camera
+    #global global_camera
     
     return Response(gen(global_camera),
             mimetype='multipart/x-mixed-replace; boundary=frame')
 
-@socketio.on('input image', namespace='/test')
+@socketio.on('input image')
 def test_message(input):
     print("\n\nBEGIN", input, "\n\nEND")
     # input = input.split(",")[1]

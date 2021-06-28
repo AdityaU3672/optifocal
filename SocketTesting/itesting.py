@@ -13,6 +13,10 @@ fd.close()
 nparr = np.frombuffer(img_str, np.uint8)
 img_np = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
+print(img_str)
+print(type(img_str))
+print(type(nparr))
+print(nparr)
 #rgb = np.random.randint(255, size=(900,800,3),dtype=np.uint8)
 
 cv2.imshow('RGB',img_np)

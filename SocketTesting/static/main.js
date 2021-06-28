@@ -1,22 +1,24 @@
 $(document).ready(function(){
-    // let namespace = "/test";
+    //let namespace = "/test";
     let video = document.querySelector("#videoElement");
     let canvas = document.querySelector("#canvasElement");
     let ctx = canvas.getContext('2d');
     // photo = document.getElementById('photo');
     var localMediaStream = null;
-  
-    var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+    
+    var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+    //socket.emit("testing", "working");
   
     function sendSnapshot() {
       if (!localMediaStream) {
         return;
       }
-  
+
+      // console.log("hello");
       ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight, 0, 0, 300, 150);
-  
-      let dataURL = canvas.toDataURL('image/jpeg');
-      socket.emit('input image', dataURL);
+      let image=new Image()
+      image.src = canvas.toDataURL('image/jpeg');
+      socket.emit('newframe', image);
   
     //   socket.emit('output image')
       

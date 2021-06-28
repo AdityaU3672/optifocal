@@ -99,7 +99,7 @@ class attn_detector:
         return jpeg.tobytes()
 
     def __del__(self):
-        self.cap.release()
+        #self.cap.release()
         cv2.destroyAllWindows()
 
     ## SECTION 1: GENERAL FACE DETECTION
@@ -311,10 +311,21 @@ class attn_detector:
 
     ## SECTION 6: INIT
 
-    def update(self, image):
-        self.img = {SOMETHING THAT TAKES BYTE DATA AND MAKES IT THE CV2 FORMAT}
+    def decodeimg(self, img_str):
+        nparr = np.frombuffer(img_str.encode('utf-8'), np.uint8)
+        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-        return self.propogate()
+        cv2.imshow('RGB',img)
+        return img
+
+    def update(self, imgstr):
+        if self.img:
+            self.img = self.decodeimg(imgstr)
+
+        else:
+            self.cam_init(imgstr)
+
+        self.propogate()
 
     def cam_release(self):
         if self.cap:
@@ -327,11 +338,8 @@ class attn_detector:
             self.consec_hori.reset()
             self.consec_vert.reset()
 
-    def cam_capture(self):
-        self.cap = cv2.VideoCapture(self.cam)
-            # assuming that the camera stays constant, we can get these values at the start
-        # if there is the possibility that the camera can change, put everythig here into the loop
-        _, self.img = self.cap.read()
+    def cam_init(self, imgstr):
+        self.img = self.decodeimg(imgstr)
         size = self.img.shape
         
         self.xmin = (size[1]//10)
@@ -349,12 +357,13 @@ class attn_detector:
         #PREREQS DONE
         self.propogate = self.calibrate
 
-    def __init__(self, mdel = "shape_68.dat", cam = 0) -> None:
+    def __init__(self, mdel = "shape_68.dat") -> None:
         self.detector = dlib.get_frontal_face_detector()
         self.predictor = dlib.shape_predictor(mdel)
         
-        self.cap = 0
-        self.cam = cam
+        #self.cap = 0
+        #self.cam = cam
+        self.img = 0
         self.font = cv2.FONT_HERSHEY_SIMPLEX
 
         self.model_points = make3d()
