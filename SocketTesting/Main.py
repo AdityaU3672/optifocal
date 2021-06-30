@@ -3,6 +3,10 @@ import numpy as np
 import cv2
 from flask_socketio import SocketIO
 import droid_eyes as DE
+import io
+import base64
+from io import StringIO
+#from PIL import Image
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -23,14 +27,15 @@ def home():
 @socketio.on('newframe')
 def loadframe(image):
     print("image received")
-    #global_camera.update(image)
-    global x
+    global_camera.update(base64.b64decode(image))
+    #global x
     
-    f = open(x, "wb")
-    f.write(image.encode())
-    f.close()
+    #f = open(x, "wb")
+    #f.write(base64.b64decode(image))
+    #f.close()
 
-    x = "wow.jpg"
+    #x = "wow.jpg"
+
     # img_str = fd.read()
     # fd.close()
 

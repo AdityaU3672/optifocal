@@ -309,23 +309,28 @@ class attn_detector:
         return Horizontal, Vertical, Gaze
 
 
+
+
+
+
+
+
+
+
+
+
     ## SECTION 6: INIT
 
-    def decodeimg(self, img_str):
-        nparr = np.frombuffer(img_str.encode('utf-8'), np.uint8)
+    def decodeimg(self, img_bin):
+        nparr = np.frombuffer(img_bin, np.uint8)
         img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-        cv2.imshow('RGB',img)
+        #cv2.imshow('RGB',img)
         return img
 
-    def update(self, imgstr):
-        if self.img:
-            self.img = self.decodeimg(imgstr)
-
-        else:
-            self.cam_init(imgstr)
-
-        self.propogate()
+    def happen(self, imgstr):
+        self.img = self.decodeimg(imgstr)
+        return self.propogate()
 
     def cam_release(self):
         if self.cap:
@@ -356,6 +361,7 @@ class attn_detector:
 
         #PREREQS DONE
         self.propogate = self.calibrate
+        self.update = self.happen
 
     def __init__(self, mdel = "shape_68.dat") -> None:
         self.detector = dlib.get_frontal_face_detector()
@@ -385,6 +391,8 @@ class attn_detector:
 
         self.base_yaw = 0
         self.base_pitch = 0
+
+        self.update = self.cam_init
 
 
 
