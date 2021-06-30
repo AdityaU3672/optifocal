@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify, Response
 import numpy as np
 import cv2
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO, emit
 import droid_eyes as DE
 import io
 import base64
@@ -12,22 +12,34 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
 x = "inpt.jpg"
+vals = ["horizontal", "vertical", "pitch", "yaw", "roll", "startpt", "endpt"]
 
 global_camera = DE.attn_detector()
 
 @app.route('/')
 def home():
+    global_camera.reset()
     return render_template("index.html")
 
 # @socketio.on('testing')
 # def lfrm(inpt):
 #     print(inpt)
 
+
+# @socketio.on("reset")
+# def resetcam():
+#     global_camera.reset()
+
 #Updates when there's a new frame
-@socketio.on('newframe')
+@socketio.on("newframe")
 def loadframe(image):
-    print("image received")
-    global_camera.update(base64.b64decode(image))
+    #print("image received")
+    jdata = global_camera.update(base64.b64decode(image))
+    print(jdata)
+    jdict = {t: v for (t, v) in zip(vals, jdata)}
+    print(jdict)
+    emit("variables", jdict)
+
     #global x
     
     #f = open(x, "wb")
@@ -66,18 +78,10 @@ def video_feed():
     return Response(gen(global_camera),
             mimetype='multipart/x-mixed-replace; boundary=frame')
 
-@socketio.on('input image')
-def test_message(input):
-    print("\n\nBEGIN", input, "\n\nEND")
-    # input = input.split(",")[1]
-    # camera.enqueue_input(input)
-    # image_data = input # Do your magical Image processing here!!
-    # #image_data = image_data.decode("utf-8")
-    # image_data = "data:image/jpeg;base64," + image_data
-    # print("OUTPUT " + image_data)
-    # emit('out-image-event', {'image_data': image_data}, namespace='/test')
-    # #camera.enqueue_input(base64_to_pil_image(input))
+# @socketio.on('input image')
+# def test_message(input):
+#     print("\n\nBEGIN", input, "\n\nEND")
 
 
 if __name__ == '__main__':
-    socketio.run(app)
+    socketio.run(app, host='127.0.0.1',port='5000',debug=True)

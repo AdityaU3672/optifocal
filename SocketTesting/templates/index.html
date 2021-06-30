@@ -14,10 +14,62 @@
 
 </head>
 <body>
-    <video autoplay="true" id="videoElement" style="display:none"></video>
-    <canvas id="canvasElement" style="display:none" ></canvas>
-    <img class="face "id="bg" src="{{ url_for('video_feed')  }}" alt="Lol">
-        
+    <video autoplay="true" id="videoElement" style="display:none" ></video>
+    <canvas id="canvasElement"></canvas>
+    <!-- <img class="face "id="bg" src="{{ url_for('video_feed')  }}" alt="Lol"> -->
+
+    <button id="reset"> Reset</button>
+
+    <div style="border: solid black 1px;">
+        <h1>Horizontal</h1>
+        <p id= "horizontal" class="vals">-</p>
+    </div>
+
+    <div style="border: solid black 1px;">
+    <h1>Vertical</h1>
+    <p id= "vertical" class="vals">-</p>
+    </div>
+
+    <div style="border: solid black 1px;">
+    <h1>Pitch</h1>
+    <p id= "pitch" class="vals">-</p>
+    </div>
+
+    <div style="border: solid black 1px;">
+    <h1>Yaw</h1>
+    <p id= "yaw" class="vals">-</p>
+    </div>
+
+    <div style="border: solid black 1px;">
+    <h1>Roll</h1>
+    <p id= "roll" class="vals">-</p>
+    </div>
+
+    <!-- <table>
+        <tr>
+          <th colspan="5">Image data</th>
+        </tr>
+        <tr>
+          <td>Horizontal</td>
+          <td id = "horizontal" class="vals></td>
+        </tr>
+        <tr>
+          <td>Vertical</td>
+          <td id = "vertical" class="vals></td>
+        </tr>
+        <tr>
+          <td>Pitch</td>
+          <td id = "pitch" class="vals></td>
+        </tr>
+        <tr>
+          <td>Yaw</td>
+          <td id = "yaw" class="vals></td>
+        </tr>
+        <tr>
+          <td>Roll</td>
+          <td id = "roll" class="vals></td>
+        </tr>
+      </table> -->
     <!--<img id="photo">-->
 </body>
 

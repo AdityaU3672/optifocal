@@ -117,11 +117,12 @@ class attn_detector:
         
         # Comment out, only for debugging
         (nose_end_point2D, jacobian) = cv2.projectPoints(np.array([(0.0, 0.0, 1000.0)]), rotation_vector, translation_vector, self.camera_matrix, self.dist_coeffs)
-        p1 = ( int(image_points[0][0]), int(image_points[0][1]))
-        p2 = ( int(nose_end_point2D[0][0][0]), int(nose_end_point2D[0][0][1]))
-        result=str(p2[0])+" "+str(p2[1])
-        cv2.line(self.img, p1, p2, (255,0,0), 2)
-        
+        self.p1 = ( int(image_points[0][0]), int(image_points[0][1]))
+        self.p2 = ( int(nose_end_point2D[0][0][0]), int(nose_end_point2D[0][0][1]))
+        #result=str(p2[0])+" "+str(p2[1])
+        cv2.line(self.img, self.p1, self.p2, (255,0,0), 2)
+
+        print(self.p1, self.p2)
         
         return get_euler_angle(rotation_vector)
 
@@ -235,6 +236,7 @@ class attn_detector:
             print("Face not Found")
             self.calib_hori.reset()
             self.calib_vert.reset()
+            return -3, -3, 0, 0, 0, 0, 0
         
         else:
             face = faces[biggestface]
@@ -243,6 +245,7 @@ class attn_detector:
                 print("Out of Frame")
                 self.calib_hori.reset()
                 self.calib_vert.reset()
+                return -3, -3, 0, 0, 0, 0, 0
 
             else:
                 shape = self.predictor(gray, face)
@@ -259,7 +262,7 @@ class attn_detector:
                 if not (self.base_yaw == None or self.base_pitch == None):
                     self.propogate = self.run
 
-        return -2, -2, -2
+                return -2, -2, pitch, yaw, roll, self.p1, self.p2
     
 
 
@@ -277,13 +280,14 @@ class attn_detector:
         faces = self.detector(gray )#, 1) # adding this second argument detects faces better, but is significantyl slower
         biggestface = faceIndex(faces)
         
-        Horizontal = -2
-        Vertical = -2
-        Gaze = -2
+        # Horizontal = -3
+        # Vertical = -3
+        # Gaze = -3
 
         if biggestface < 0:
             self.put_text("FACE NOT FOUND", (25, 40), (0,255,0))
             print("Face not found")
+            return -3, -3, 0, 0, 0, 0, 0
         else:
             face = faces[biggestface]
             shape = self.predictor(gray, face)
@@ -296,17 +300,17 @@ class attn_detector:
 
             Horizontal, Vertical = self.check_pose(pitch,yaw,roll)
             
-            if not (Vertical or Horizontal):
-                ear_left = self.eye_aspect_ratio(shape, self.left)
-                ear_right = self.eye_aspect_ratio(shape, self.right)
-                ear_avg = (ear_left + ear_right)/2
-                Gaze = self.check_eyes(ear_avg, shape, gray)
+            # if not (Vertical or Horizontal):
+            #     ear_left = self.eye_aspect_ratio(shape, self.left)
+            #     ear_right = self.eye_aspect_ratio(shape, self.right)
+            #     ear_avg = (ear_left + ear_right)/2
+            #     Gaze = self.check_eyes(ear_avg, shape, gray)
 
             # Comment out for debugging purposes only
             self.put_text("HORI: " + self.Hoript[Horizontal], (25, 190))
             self.put_text("VERT: " + self.Vertpt[Vertical], (25, 230))
 
-        return Horizontal, Vertical, Gaze
+            return Horizontal, Vertical, pitch, yaw, roll, self.p1, self.p2
 
 
 
@@ -332,16 +336,15 @@ class attn_detector:
         self.img = self.decodeimg(imgstr)
         return self.propogate()
 
-    def cam_release(self):
-        if self.cap:
-            self.cap.release()
+    def reset(self):
+        self.calib_hori.reset()
+        self.calib_vert.reset()
 
-            self.calib_hori.reset()
-            self.calib_vert.reset()
+        self.consec_gaze.reset()
+        self.consec_hori.reset()
+        self.consec_vert.reset()
 
-            self.consec_gaze.reset()
-            self.consec_hori.reset()
-            self.consec_vert.reset()
+        self.update = self.cam_init
 
     def cam_init(self, imgstr):
         self.img = self.decodeimg(imgstr)
