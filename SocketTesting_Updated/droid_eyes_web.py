@@ -1,7 +1,11 @@
 import cv2, dlib, math
 import numpy as np
 from scipy.spatial import distance as dist
+
 from EulerAng import faceIndex, make3d, make2d, get_euler_angle
+
+dect = dlib.get_frontal_face_detector()
+pred = dlib.shape_predictor("shape_68.dat")
 
 class Counter():
     def __init__(self, frames, ratio = 0.6) -> None:
@@ -42,6 +46,7 @@ class Counter():
         self.count0 = 0
         self.count1 = 0
 
+
 class Calibrator:
     def __init__(self, limt, thres, name = "") -> None:
         self.limt = limt
@@ -80,27 +85,9 @@ class Calibrator:
         self.min = math.inf
         self.max = -math.inf
 
+
+
 class attn_detector:
-
-    ## SECTION 0: MISCELLANEOUS HELPERS
-
-    def put_text(self, inpt, loc, clr = (0, 0, 255)):
-        return cv2.putText(self.img, inpt, loc, self.font, 1, clr, 2, cv2.LINE_AA)
-
-    def get_img(self):
-        return self.img
-
-    def display(self, lab = "Output"):
-        cv2.imshow(lab, self.img)
-
-    def get_frame(self):
-        ret, jpeg = cv2.imencode('.jpg', self.img)
-        return jpeg.tobytes()
-
-    def __del__(self):
-        #self.cap.release()
-        cv2.destroyAllWindows()
-
     ## SECTION 1: GENERAL FACE DETECTION
     
     def not_in(self, tLeft, bRight):
@@ -118,111 +105,31 @@ class attn_detector:
         (nose_end_point2D, jacobian) = cv2.projectPoints(np.array([(0.0, 0.0, 1000.0)]), rotation_vector, translation_vector, self.camera_matrix, self.dist_coeffs)
         self.p1 = ( int(image_points[0][0]), int(image_points[0][1]))
         self.p2 = ( int(nose_end_point2D[0][0][0]), int(nose_end_point2D[0][0][1]))
-        #result=str(p2[0])+" "+str(p2[1])
-        cv2.line(self.img, self.p1, self.p2, (255,0,0), 2)
 
-        print(self.p1, self.p2)
+        #result=str(p2[0])+" "+str(p2[1])
+        #cv2.line(self.img, self.p1, self.p2, (255,0,0), 2)
+        #print(self.p1, self.p2)
         
         return get_euler_angle(rotation_vector)
 
     def check_pose(self, pitch, yaw, roll):
 
         # Comment out, only for debugging
-        pose_str = "Pitch:{:.2f}, Yaw:{:.2f}, Roll:{:.2f}".format(pitch, yaw, roll)
-        self.put_text(pose_str, (25, 80), (0,255,0))
-        
+        #pose_str = "Pitch:{:.2f}, Yaw:{:.2f}, Roll:{:.2f}".format(pitch, yaw, roll)
+        #self.put_text(pose_str, (25, 80), (0,255,0))
         #self.consec_hori.display("Horizontal:")
         #self.consec_vert.display("Vertical:")
             
         return self.consec_hori.update(yaw<-30, yaw > 30), self.consec_vert.update(pitch > 10, pitch < -10)
 
 
+    ## SECTION 3: INDEPENDENT FUNCTIONS
+    # TOBEDONE
 
-
-
-
-
-
-
-    ## SECTION 3: GAZE DETECTION
-
-    def get_gaze_ratio(self, eye_points, facial_landmarks, gray):
-        left_eye_region = np.array([(facial_landmarks.part(eye_points[0]).x, facial_landmarks.part(eye_points[0]).y),
-                                    (facial_landmarks.part(eye_points[1]).x, facial_landmarks.part(eye_points[1]).y),
-                                    (facial_landmarks.part(eye_points[2]).x, facial_landmarks.part(eye_points[2]).y),
-                                    (facial_landmarks.part(eye_points[3]).x, facial_landmarks.part(eye_points[3]).y),
-                                    (facial_landmarks.part(eye_points[4]).x, facial_landmarks.part(eye_points[4]).y),
-                                    (facial_landmarks.part(eye_points[5]).x, facial_landmarks.part(eye_points[5]).y)], np.int32)
-        # cv2.polylines(frame, [left_eye_region], True, (0, 0, 255), 2)
-
-        height, width, _ = self.img.shape
-        mask = np.zeros((height, width), np.uint8)
-        cv2.polylines(mask, [left_eye_region], True, 255, 2)
-        cv2.fillPoly(mask, [left_eye_region], 255)
-        eye = cv2.bitwise_and(gray, gray, mask=mask)
-
-        min_x = np.min(left_eye_region[:, 0])
-        max_x = np.max(left_eye_region[:, 0])
-        min_y = np.min(left_eye_region[:, 1])
-        max_y = np.max(left_eye_region[:, 1])
-
-        gray_eye = eye[min_y: max_y, min_x: max_x]
-        _, threshold_eye = cv2.threshold(gray_eye, 70, 255, cv2.THRESH_BINARY)
-        height, width = threshold_eye.shape
-        left_side_threshold = threshold_eye[0: height, 0: int(width / 2)]
-        left_side_white = cv2.countNonZero(left_side_threshold)
-
-        right_side_threshold = threshold_eye[0: height, int(width / 2): width]
-        right_side_white = cv2.countNonZero(right_side_threshold)
-
-        if left_side_white == 0:
-            gaze_ratio = 1
-        elif right_side_white == 0:
-            gaze_ratio = 5
-        else:
-            gaze_ratio = left_side_white / right_side_white
-        return gaze_ratio
-
-    def updt_gaze(self, landmarks, gray):
-            gaze_ratio_left_eye = self.get_gaze_ratio([36, 37, 38, 39, 40, 41], landmarks, gray)
-            gaze_ratio_right_eye = self.get_gaze_ratio([42, 43, 44, 45, 46, 47], landmarks, gray)
-            
-            return (gaze_ratio_right_eye + gaze_ratio_left_eye) / 2 
-
-    def eye_aspect_ratio(self, shape, side):
-        eye = [(shape.part(i).x, shape.part(i).y) for i in side]
-        return (dist.euclidean(eye[1], eye[5]) + dist.euclidean(eye[2], eye[4])) / (2.0 * dist.euclidean(eye[0], eye[3]))
-
-    def check_eyes(self, ear_avg, shape, gray):
-
-        gaze_ratio = -1
-        if ear_avg > 0.2:
-            gaze_ratio = self.updt_gaze(shape, gray)
-            gazedir = self.consec_gaze.update(gaze_ratio >= 1.5, gaze_ratio <= 1)
-
-        else:
-            gazedir = 2
-            self.consec_gaze.decrement()
-
-        # Comment out for debugging purposes only
-        gaze_str = "EAR:{:.2f}, Gaze:{:.2f}".format(ear_avg, gaze_ratio)    
-        self.put_text(gaze_str, (25, 40), (0,255,0))
-        self.put_text("GAZE: " + self.Gazept[gazedir] , (25, 150))
-
-        return gazedir
 
     ## SECTION 4: UPDATING THE IMAGE AND ACTUALLY CHECKING POSE/GAZE/ECT
 
-
-
-
-
     def calibrate(self):
-        # ret, self.img = self.cap.read()
-
-        # if not ret:
-        #     return -3, -3, -3
-
         gray = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
         faces = self.detector(gray) # , 1) # adding this second argument detects faces better, but is significantyl slower
         biggestface = faceIndex(faces)
@@ -231,7 +138,7 @@ class attn_detector:
         #calib_vert.display()
 
         if biggestface < 0:
-            self.put_text("FACE NOT FOUND", (25, 40), (0,255,0))
+            #self.put_text("FACE NOT FOUND", (25, 40), (0,255,0))
             print("Face not Found")
             self.calib_hori.reset()
             self.calib_vert.reset()
@@ -252,8 +159,8 @@ class attn_detector:
                 pitch = 180 - pitch if pitch > 0 else -180 - pitch
 
                 # Comment out, only for debugging
-                pose_str = "Pitch:{}, Yaw:{:}, Roll:{:}".format(pitch, yaw, roll)
-                self.put_text(pose_str, (25, 80), (0,255,0))
+                #pose_str = "Pitch:{}, Yaw:{:}, Roll:{:}".format(pitch, yaw, roll)
+                #self.put_text(pose_str, (25, 80), (0,255,0))
                 
                 self.base_yaw = self.calib_hori.update(yaw)
                 self.base_pitch = self.calib_vert.update(pitch)
@@ -264,27 +171,14 @@ class attn_detector:
                 return -2, -2, pitch, yaw, roll, self.p1, self.p2
     
 
-
-
-
-
-
     def run(self):
-        # ret, self.img = self.cap.read()
-
-        # if not ret:
-        #     return -3, -3, -3;
-
         gray = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
         faces = self.detector(gray )#, 1) # adding this second argument detects faces better, but is significantyl slower
         biggestface = faceIndex(faces)
         
-        # Horizontal = -3
-        # Vertical = -3
-        # Gaze = -3
-
         if biggestface < 0:
-            self.put_text("FACE NOT FOUND", (25, 40), (0,255,0))
+            #self.put_text("FACE NOT FOUND", (25, 40), (0,255,0))
+
             print("Face not found")
             return -3, -3, 0, 0, 0, 0, 0
         else:
@@ -294,6 +188,8 @@ class attn_detector:
             ret, pitch, yaw, roll = self.updt_pose(shape)
 
             pitch = 180 - pitch if pitch > 0 else -180 - pitch
+
+
             yaw -= self.base_yaw
             pitch -= self.base_pitch
 
@@ -306,30 +202,16 @@ class attn_detector:
             #     Gaze = self.check_eyes(ear_avg, shape, gray)
 
             # Comment out for debugging purposes only
-            self.put_text("HORI: " + self.Hoript[Horizontal], (25, 190))
-            self.put_text("VERT: " + self.Vertpt[Vertical], (25, 230))
+            # self.put_text("HORI: " + self.Hoript[Horizontal], (25, 190))
+            # self.put_text("VERT: " + self.Vertpt[Vertical], (25, 230))
 
             return Horizontal, Vertical, pitch, yaw, roll, self.p1, self.p2
-
-
-
-
-
-
-
-
-
-
 
 
     ## SECTION 6: INIT
 
     def decodeimg(self, img_bin):
-        nparr = np.frombuffer(img_bin, np.uint8)
-        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-
-        #cv2.imshow('RGB',img)
-        return img
+        return cv2.imdecode(np.frombuffer(img_bin, np.uint8), cv2.IMREAD_COLOR)
 
     def happen(self, imgstr):
         self.img = self.decodeimg(imgstr)
@@ -364,17 +246,12 @@ class attn_detector:
         #PREREQS DONE
         self.propogate = self.calibrate
         self.update = self.happen
-        
+
         return -3, -3, 0, 0, 0, 0, 0
 
-    def __init__(self, pred) -> None:
+    def __init__(self) -> None:
         self.detector = dlib.get_frontal_face_detector()
-        self.predictor = pred
-        
-        #self.cap = 0
-        #self.cam = cam
-        self.img = 0
-        self.font = cv2.FONT_HERSHEY_SIMPLEX
+        self.predictor = dlib.shape_predictor("shape_68.dat")
 
         self.model_points = make3d()
         self.dist_coeffs = np.zeros((4,1))
@@ -389,14 +266,10 @@ class attn_detector:
         self.consec_hori = Counter(25)
         self.consec_vert = Counter(25)
 
-        self.Vertpt = {0 : "CENTER", 1 : "UP", -1 : "DOWN"}                         # Looking up and down (pitch)
-        self.Hoript = {0 : "CENTER", 1 : "LEFT", -1 : "RIGHT"}                      # Looking left and right (yaw)
-        self.Gazept = {0 : "CENTER", 1 : "LEFT", -1 : "RIGHT", 2 : "CLOSED"}        #Gaze
+        # self.Vertpt = {0 : "CENTER", 1 : "UP", -1 : "DOWN"}                         # Looking up and down (pitch)
+        # self.Hoript = {0 : "CENTER", 1 : "LEFT", -1 : "RIGHT"}                      # Looking left and right (yaw)
 
         self.base_yaw = 0
         self.base_pitch = 0
 
         self.update = self.cam_init
-
-
-

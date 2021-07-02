@@ -12,7 +12,7 @@ $(document).ready(function () {
 
   //RECIEVING DATA FROM BACKEND
   socket.on("variables", (data) => {
-    // console.log(data);
+    console.log(data);
     hor = data.horizontal;
     if (hor == -3) {
       document.getElementById("happening").classList.remove("calibrating");
@@ -37,9 +37,15 @@ $(document).ready(function () {
       document.getElementById("happening").classList.add("calibrating");
       document.getElementById("happening").textContent = "Calibrating";
 
-      document.getElementById("pitch").textContent = "Pitch : -";
-      document.getElementById("yaw").textContent = "Yaw : -";
-      document.getElementById("roll").textContent = "Roll : -";
+      // document.getElementById("pitch").textContent = "Pitch : -";
+      // document.getElementById("yaw").textContent = "Yaw : -";
+      // document.getElementById("roll").textContent = "Roll : -";
+
+      document.querySelector("#pitch").textContent =
+      "Pitch: " + data.pitch.toFixed(2);
+    document.querySelector("#yaw").textContent = "Yaw: " + data.yaw.toFixed(2);
+    document.querySelector("#roll").textContent =
+      "Roll: " + data.roll.toFixed(2);
       return;
     }
 
@@ -132,7 +138,7 @@ $(document).ready(function () {
 
       setInterval(function () {
         sendSnapshot();
-      }, 22);
+      }, 50);
     })
     .catch(function (error) {
       console.log(error);

@@ -1,19 +1,15 @@
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
-from droid_eyes import attn_detector
-import base64, dlib
-
-
-spred = dlib.shape_predictor("shape_68.dat")
+from droid_eyes_web import attn_detector
+import base64
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secret!'
+#app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
 
 vals = ["horizontal", "vertical", "pitch", "yaw", "roll", "startpt", "endpt"]
 cameras = {}
 
-x = attn_detector(spred)
 
 @app.route('/')
 def home():
@@ -22,7 +18,7 @@ def home():
 @socketio.on('connect')
 def gen_key():
     print("CONNECTED TO:", request.sid)
-    cameras[request.sid] = attn_detector(spred)
+    cameras[request.sid] = attn_detector()
 
 @socketio.on('disconnect')
 def del_key():
@@ -34,10 +30,11 @@ def del_key():
 @socketio.on("newframe")
 def loadframe(image):
     print("image received from: ", request.sid)
-    # jdata = cameras[request.sid].update(base64.b64decode(image))
-    # jdict = {t: v for (t, v) in zip(vals, jdata)}
-    # print(jdict)
-    # emit("variables", jdict, to=request.sid)
+    jdata = cameras[request.sid].update(base64.b64decode(image))
+    jdict = {t: v for (t, v) in zip(vals, jdata)}
+    jdict["sid"] = request.sid
+    print(jdict)
+    emit("variables", jdict, to=request.sid)
 
 
 if __name__ == '__main__':
