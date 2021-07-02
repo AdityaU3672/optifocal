@@ -16,6 +16,7 @@ vals = ["horizontal", "vertical", "pitch", "yaw", "roll", "startpt", "endpt"]
 
 global_camera = DE.attn_detector()
 
+
 @app.route('/')
 def home():
     global_camera.reset()
@@ -30,6 +31,7 @@ def home():
 # def resetcam():
 #     global_camera.reset()
 
+
 #Updates when there's a new frame
 @socketio.on("newframe")
 def loadframe(image):
@@ -37,7 +39,7 @@ def loadframe(image):
     jdata = global_camera.update(base64.b64decode(image))
     print(jdata)
     jdict = {t: v for (t, v) in zip(vals, jdata)}
-    print(jdict)
+    jdict["session"]=request.sid
     emit("variables", jdict, room=request.sid)
 
     #global x

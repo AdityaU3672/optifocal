@@ -12,6 +12,7 @@ $(document).ready(function () {
 
   //RECIEVING DATA FROM BACKEND
   socket.on("variables", (data) => {
+    // console.log(data);
     hor = data.horizontal;
     if (hor == -3) {
       document.getElementById("happening").classList.remove("calibrating");
@@ -19,7 +20,9 @@ $(document).ready(function () {
       document.getElementById("happening").classList.add("notFound");
       document.getElementById("happening").textContent = "Face not Found";
 
-      document.getElementById("data").classList.add("hidden");
+      document.getElementById("pitch").textContent = "Pitch : -";
+      document.getElementById("yaw").textContent = "Yaw : -";
+      document.getElementById("roll").textContent = "Roll : -";
 
       // TRYING TO CLEAR THE LINE FROM THE CANVAS BY JUST DISPLAYING VIDEO FEED
       startpt = [-1, -1];
@@ -33,31 +36,41 @@ $(document).ready(function () {
       document.getElementById("happening").classList.remove("allGood");
       document.getElementById("happening").classList.add("calibrating");
       document.getElementById("happening").textContent = "Calibrating";
-      document.getElementById("data").classList.add("hidden");
+
+      document.getElementById("pitch").textContent = "Pitch : -";
+      document.getElementById("yaw").textContent = "Yaw : -";
+      document.getElementById("roll").textContent = "Roll : -";
       return;
     }
 
-    document.getElementById("data").classList.remove("hidden");
     document.getElementById("happening").classList.remove("notFound");
     document.getElementById("happening").classList.remove("calibrating");
     document.getElementById("happening").classList.add("allGood");
-    document.getElementById("happening").textContent = "All good";
+
+    let horizontal = "middle";
+    let vertical = "middle";
 
     hor == -1
-      ? (document.querySelector("#horizontal").textContent = "right")
+      ? (horizontal = "right")
       : hor == 0
-      ? (document.querySelector("#horizontal").textContent = "middle")
-      : (document.querySelector("#horizontal").textContent = "left");
+      ? (horizontal = "middle")
+      : (horizontal = "left");
 
     data.vertical == -1
-      ? (document.querySelector("#vertical").textContent = "down")
+      ? (vertical = "down")
       : data.vertical == 0
-      ? (document.querySelector("#vertical").textContent = "center")
-      : (document.querySelector("#vertical").textContent = "up");
+      ? (vertical = "center")
+      : (vertical = "up");
 
-    document.querySelector("#pitch").textContent = data.pitch;
-    document.querySelector("#yaw").textContent = data.yaw;
-    document.querySelector("#roll").textContent = data.roll;
+    document.getElementById(
+      "happening"
+    ).textContent = `You are looking ${horizontal}, ${vertical}`;
+
+    document.querySelector("#pitch").textContent =
+      "Pitch: " + data.pitch.toFixed(2);
+    document.querySelector("#yaw").textContent = "Yaw: " + data.yaw.toFixed(2);
+    document.querySelector("#roll").textContent =
+      "Roll: " + data.roll.toFixed(2);
 
     startpt[0] = data.startpt[0];
     startpt[1] = data.startpt[1];
@@ -67,9 +80,9 @@ $(document).ready(function () {
   });
 
   //RESET BUTTON
-  document.querySelector("#reset").addEventListener("click", () => {
-    location.reload();
-  });
+  // document.querySelector("#reset").addEventListener("click", () => {
+  //   location.reload();
+  // });
 
   // FUNCTION TO SEND IMAGE TO BACKEND
   function sendSnapshot() {
@@ -82,7 +95,7 @@ $(document).ready(function () {
     // canvas.width = video.videoWidth;
     // canvas.height = video.videoHeight;
 
-    // CHANGING CANVAS WIDTH TO 740
+    // CHANGING CANVAS WIDTH TO 640
     canvas.width = 740;
     canvas.height = video.videoHeight / (video.videoWidth / 740);
 

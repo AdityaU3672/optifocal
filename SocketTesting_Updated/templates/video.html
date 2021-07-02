@@ -36,22 +36,49 @@
     <title>Distraction Detector</title>
   </head>
   <body>
-    <section id="first">
-      <section id="face">
-        <div class="heading_div">
-          <h1 class="heading">Face Pose Detection</h1>
-          <h2 id="happening" class="calibrating">Status</h2>
+    <section id="face">
+      <div class="heading_div">
+        <h1 class="heading">Face Pose Detection</h1>
+        <h2 id="happening" class="calibrating">Status</h2>
+      </div>
+
+      <!-- VIDEO ELEMENT -->
+      <video autoplay="true" id="videoElement" class="video"></video>
+
+      <div class="container-fluid" id="face-and-data">
+        <div class="row">
+          <div class="col angles">
+            <h1 class="angle-title">Euler Angles</h1>
+            <div class="angle">
+              <h2 class="angle-name vals" id="pitch">Pitch : -</h2>
+            </div>
+            <div class="angle">
+              <h2 class="angle-name vals" id="yaw">Yaw : -</h2>
+            </div>
+            <div class="angle">
+              <h2 class="angle-name vals" id="roll">Roll : -</h2>
+            </div>
+          </div>
+          <div class="col image">
+            <canvas id="canvasElement" class="canvas"></canvas>
+          </div>
+          <div class="col-lg-3 instructions-div">
+            <h2 class="instructions-header">Instructions</h2>
+            <p class="instruction">
+              1. "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
+              do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </p>
+
+            <p class="instruction">
+              2. "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
+              do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </p>
+          </div>
         </div>
+      </div>
+    </section>
 
-        <!-- VIDEO ELEMENT -->
-        <video autoplay="true" id="videoElement" class="video"></video>
-
-        <div class="image_div">
-          <canvas id="canvasElement" class="canvas"></canvas>
-        </div>
-      </section>
-
-      <section id="data" class="">
+    <!-- <section id="data" class="">
         <div class="container-fluid hor-vert">
           <div class="row">
             <div class="col-lg-4">
@@ -85,8 +112,8 @@
             </div>
           </div>
         </div>
-      </section>
-    </section>
+      </section> -->
+
     <!-- <div style="border: solid black 1px">
       <h1>Horizontal</h1>
       <p id="horizontal" class="vals">-</p>
@@ -111,6 +138,7 @@
       <h1>Roll</h1>
       <p id="roll" class="vals">-</p>
     </div> -->
+
     <section id="info">
       <div class="info_heading_div">
         <h1 class="info_heading">What do our results mean?</h1>
