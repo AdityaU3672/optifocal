@@ -38,7 +38,7 @@ def loadframe(image):
     print(jdata)
     jdict = {t: v for (t, v) in zip(vals, jdata)}
     print(jdict)
-    emit("variables", jdict)
+    emit("variables", jdict, room=request.sid)
 
     #global x
     
