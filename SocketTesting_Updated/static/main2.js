@@ -24,7 +24,7 @@ $(document).ready(function () {
     hor = data.horizontal;
     if (hor == -4) {
       alert(
-        "Our servers are currently under heavy stress, please try again in 5 minutes."
+        "Our servers are currently under heavy stress, please try again in 5 minutes. Re-directing you back to our home page."
       );
       window.location = "http://google.com";
       return;
