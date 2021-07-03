@@ -22,6 +22,13 @@ $(document).ready(function () {
   socket.on("variables", (data) => {
     console.log(data);
     hor = data.horizontal;
+    if (hor == -4) {
+      alert(
+        "Our servers are currently under heavy stress, please try again in 5 minutes."
+      );
+      window.location = "http://google.com";
+      return;
+    }
     if (hor == -3) {
       notFoundCount++;
 
