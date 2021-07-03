@@ -6,6 +6,14 @@ $(document).ready(function () {
   let endpt = [-1, -1];
   var localMediaStream = null;
 
+  // GLOBAL VALUES
+  let horizontal = " - ";
+  let vertical = " - ";
+  let pitch = 0;
+  let yaw = 0;
+  let roll = 0;
+  let notFoundCount = 0;
+
   var socket = io.connect(
     location.protocol + "//" + document.domain + ":" + location.port
   );
@@ -15,14 +23,26 @@ $(document).ready(function () {
     console.log(data);
     hor = data.horizontal;
     if (hor == -3) {
-      document.getElementById("happening").classList.remove("calibrating");
-      document.getElementById("happening").classList.remove("allGood");
-      document.getElementById("happening").classList.add("notFound");
-      document.getElementById("happening").textContent = "Face not Found";
+      notFoundCount++;
 
-      document.getElementById("pitch").textContent = "Pitch : -";
-      document.getElementById("yaw").textContent = "Yaw : -";
-      document.getElementById("roll").textContent = "Roll : -";
+      // Only display face not found if calibrating or if count exceeds 25
+      if (notFoundCount > 25 || horizontal == " - ") {
+        document.getElementById("happening").textContent = "Face not Found";
+        document.getElementById("happening").classList.remove("calibrating");
+        document.getElementById("happening").classList.remove("allGood");
+        document.getElementById("happening").classList.add("notFound");
+
+        document.getElementById("pitch").textContent = "Pitch : -";
+        document.getElementById("yaw").textContent = "Yaw : -";
+        document.getElementById("roll").textContent = "Roll : -";
+      } else {
+        document.getElementById(
+          "happening"
+        ).textContent = `You are looking ${horizontal}, ${vertical}`;
+        document.getElementById("pitch").textContent = `Pitch : ${pitch}`;
+        document.getElementById("yaw").textContent = `Yaw : ${yaw}`;
+        document.getElementById("roll").textContent = `Roll : ${roll}`;
+      }
 
       // TRYING TO CLEAR THE LINE FROM THE CANVAS BY JUST DISPLAYING VIDEO FEED
       startpt = [-1, -1];
@@ -32,29 +52,28 @@ $(document).ready(function () {
     }
 
     if (hor == -2) {
+      notFoundCount = 0;
       document.getElementById("happening").classList.remove("notFound");
       document.getElementById("happening").classList.remove("allGood");
       document.getElementById("happening").classList.add("calibrating");
       document.getElementById("happening").textContent = "Calibrating";
 
-      // document.getElementById("pitch").textContent = "Pitch : -";
-      // document.getElementById("yaw").textContent = "Yaw : -";
-      // document.getElementById("roll").textContent = "Roll : -";
+      document.getElementById("pitch").textContent = "Pitch : -";
+      document.getElementById("yaw").textContent = "Yaw : -";
+      document.getElementById("roll").textContent = "Roll : -";
 
-      document.querySelector("#pitch").textContent =
-      "Pitch: " + data.pitch.toFixed(2);
-    document.querySelector("#yaw").textContent = "Yaw: " + data.yaw.toFixed(2);
-    document.querySelector("#roll").textContent =
-      "Roll: " + data.roll.toFixed(2);
+      //   document.querySelector("#pitch").textContent =
+      //   "Pitch: " + data.pitch.toFixed(2);
+      // document.querySelector("#yaw").textContent = "Yaw: " + data.yaw.toFixed(2);
+      // document.querySelector("#roll").textContent =
+      //   "Roll: " + data.roll.toFixed(2);
       return;
     }
 
+    notFoundCount = 0;
     document.getElementById("happening").classList.remove("notFound");
     document.getElementById("happening").classList.remove("calibrating");
     document.getElementById("happening").classList.add("allGood");
-
-    let horizontal = "middle";
-    let vertical = "middle";
 
     hor == -1
       ? (horizontal = "right")
@@ -67,6 +86,10 @@ $(document).ready(function () {
       : data.vertical == 0
       ? (vertical = "center")
       : (vertical = "up");
+
+    pitch = data.pitch.toFixed(2);
+    yaw = data.yaw.toFixed(2);
+    roll = data.roll.toFixed(2);
 
     document.getElementById(
       "happening"
@@ -86,9 +109,9 @@ $(document).ready(function () {
   });
 
   //RESET BUTTON
-  // document.querySelector("#reset").addEventListener("click", () => {
-  //   location.reload();
-  // });
+  document.querySelector("#reset").addEventListener("click", () => {
+    location.reload();
+  });
 
   // FUNCTION TO SEND IMAGE TO BACKEND
   function sendSnapshot() {
