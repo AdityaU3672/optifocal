@@ -5,7 +5,7 @@ import base64
 
 application = Flask(__name__)
 #app.config['SECRET_KEY'] = 'secret!'
-socketio = SocketIO(app)
+socketio = SocketIO(application)
 
 vals = ["horizontal", "vertical", "pitch", "yaw", "roll", "startpt", "endpt"]
 capacity = 4
@@ -17,11 +17,11 @@ id = 3
 for _ in range(capacity):
     cameras.append(attn_detector())
 
-@app.route('/')
+@application.route('/')
 def home():
     return render_template("index.html")
 
-@app.route('/video')
+@application.route('/video')
 def video():
     return render_template("video.html")
 
@@ -63,5 +63,5 @@ def loadframe(image):
 
 
 if __name__ == '__main__':
-    socketio.run(app, host='127.0.0.1',port='5000',debug=True)
-    #socketio.run(app, host='0.0.0.0',port='5000',debug=True) # For Docker
+    socketio.run(application, host='127.0.0.1',port='5000',debug=True)
+    #socketio.run(application, host='0.0.0.0',port='5000',debug=True) # For Docker
