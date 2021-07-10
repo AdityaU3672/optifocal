@@ -5,6 +5,8 @@ $(document).ready(function () {
   let startpt = [-1, -1];
   let endpt = [-1, -1];
   var localMediaStream = null;
+  let img = new Image();
+  img.src = "https://images.drivereasy.com/wp-content/uploads/2017/04/1-14.jpg";
 
   // GLOBAL VALUES
   let horizontal = " - ";
@@ -160,6 +162,13 @@ $(document).ready(function () {
     },
   };
 
+  if (!navigator.mediaDevices) {
+    canvas.width = 620;
+    canvas.height = 318;
+    img.onload = function () {
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    };
+  }
   navigator.mediaDevices
     .getUserMedia(constraints)
     .then(function (stream) {
